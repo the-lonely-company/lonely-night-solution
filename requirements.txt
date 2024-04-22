@@ -1,4 +1,3 @@
-pymongo[srv]==3.11
-python-dotenv
-flask
-pandas
+langchain
+fastapi
+loguru
