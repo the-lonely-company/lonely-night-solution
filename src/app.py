@@ -1,29 +1,45 @@
-from flask import Flask, request
-from src.db_connect import connect_to_db
-import pprint
+from typing import List
+
+from loguru import logger
+
+from langchain_core.messages import AIMessage, HumanMessage
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+
+from pydantic import BaseModel
+
+from fastapi.middleware.cors import CORSMiddleware
+
+from chains.whisky_chain import whisky_chain
+
+app = FastAPI(
+    title='Alcohol Backend'
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class Message(BaseModel):
+    content: str
+    chat_history: List
 
 
-app = Flask(__name__)
+def gen(content: str, chat_history: List) -> str:
+    logger.debug(content)
+    logger.debug(chat_history)
+    for chunk in whisky_chain.stream({"input": content, "chat_history": chat_history}):
+        logger.debug(chunk, end='')
+        yield chunk
 
-# write a API end-point that gets list of wines by grapes(4 in prototyping stage) 
 
-@app.route('/')
-def get4wines():
-    client = connect_to_db()
-    red_wine_db = client["red_wine"]
-    alko_db = red_wine_db["alko"]
+@app.post("/stream")
+def stream(message: Message):
+    content = message.content
+    chat_history = message.chat_history
+    gen_init = gen(message.content, chat_history)
 
-    # GET Request Parameters into query
-    args = request.args
-    grape = args['grape']
-    query = {"grapes" : grape}
-    result = alko_db.find(query)
-
-    # get first 4 wines
-    returned_wines = {"wines" : []}
-    for grapes_wine in result[:4]:
-        pprint.pprint(grapes_wine)
-        returned_wines["wines"].append(grapes_wine)
-
-    # return as JSON
-    return returned_wines
+    return StreamingResponse(gen_init, media_type="text/event-stream")
