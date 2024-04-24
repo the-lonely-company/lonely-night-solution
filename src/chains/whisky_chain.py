@@ -27,7 +27,7 @@ prompt = ChatPromptTemplate.from_messages(
 whisky_chain = (
     {
         'input': lambda x: x['input'],
-        'chat_history': lambda x: x['chat_history']
+        'chat_history': lambda x: x['chat_history'] if x['chat_history'] else []
     }
     | prompt
     | llm
