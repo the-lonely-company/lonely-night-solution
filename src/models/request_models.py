@@ -1,15 +1,8 @@
 from typing import List, Optional
-from humps import camelize
-
 from pydantic import BaseModel
 
-def to_camel(string):
-    return camelize(string)
+from models.camel_model import CamelModel
 
-class CamelModel(BaseModel):
-    class Config:
-        alias_generator = to_camel
-        allow_population_by_field_name = True
 
 class Turn(BaseModel):
     party: str

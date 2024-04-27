@@ -8,8 +8,9 @@ from fastapi.responses import StreamingResponse
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from chains.whisky_chain import whisky_chain
+from chains.full_chain import full_chain
 from models.request_models import Message, Turn
+from models.api_models import Alcohol
 
 
 app = FastAPI(
@@ -24,11 +25,12 @@ app.add_middleware(
 )
 
 def gen(content: str, chat_history: List) -> str:
-    for chunk in whisky_chain.stream({"input": content, "chat_history": chat_history}):
+    for chunk in full_chain.stream({"content": content, "chat_history": chat_history}):
         yield chunk
 
 
 def convert_to_langchain_message(turn: Turn):
+    logger.debug(turn.content)
     if turn.party == 'ai':
         return AIMessage(content=turn.content)
     
@@ -49,8 +51,8 @@ def stream(message: Message, request: Request):
 
     return StreamingResponse(gen_init, media_type="text/event-stream")
 
-@app.post("/invoke", response_model=str)
-def invoke(message: Message, request: Request) -> str:
+@app.post("/invoke")
+def invoke(message: Message, request: Request):
     content = message.content
     chat_history = [
         convert_to_langchain_message(turn)
@@ -59,4 +61,6 @@ def invoke(message: Message, request: Request) -> str:
 
     logger.info(request.headers)
 
-    return whisky_chain.invoke({'input': content, 'chat_history': chat_history})
+    response = full_chain.invoke({'content': content, 'chat_history': chat_history})
+
+    return response
