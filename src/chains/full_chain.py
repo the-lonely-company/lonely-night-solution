@@ -7,7 +7,8 @@ from llms import llm
 
 
 gate_chain = (
-    PromptTemplate.from_template('Given the user query content below, classify it as either being about `alcohol suggestion` or `Other`. Do not respond with more than two words.\n{content}'
+    PromptTemplate.from_template(
+        'Given the user query content below, classify it as either being about `alcohol suggestion` or `Other`. Do not respond with more than two words.\n{content}'
     )
     | llm
     | StrOutputParser()
