@@ -1,4 +1,4 @@
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
 from models.api_models import Alcohol
@@ -9,16 +9,18 @@ parser = JsonOutputParser(pydantic_object=Alcohol)
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        (
-            'system',
-            'You are alcohol customer service AI.'
+        SystemMessagePromptTemplate(
+            prompt=PromptTemplate(
+                template='You are alcohol customer service AI. Look at the request, then suggest 1 alcohol only.\n{format_instructions}\nReminder to ALWAYS enclose the json blob with triple backticks only.',
+                input_variables=[],
+                partial_variables={'format_instructions': parser.get_format_instructions()}
+            )
         ),
         MessagesPlaceholder(variable_name='chat_history'),
         HumanMessagePromptTemplate(
             prompt=PromptTemplate(
-                template='{format_instructions}\n{content}',
-                input_variables=['content'],
-                partial_variables={'format_instructions': parser.get_format_instructions()}    
+                template='Request: {content}',
+                input_variables=['content']    
             )
         )
     ]

@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 from loguru import logger
@@ -11,6 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from chains.full_chain import full_chain
 from models.request_models import Message, Turn
 from models.api_models import Alcohol
+from connections.mongodb.mongodb_client import db_client
+from routers.mongodb import mongodb_router
+
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
+os.environ["LANGCHAIN_API_KEY"]="ls__77cfce357c894d9b9c86905ccac64de6"
+os.environ["LANGCHAIN_PROJECT"]="Alcohol"
 
 
 app = FastAPI(
@@ -23,6 +32,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(mongodb_router)
+
 
 def gen(content: str, chat_history: List) -> str:
     for chunk in full_chain.stream({"content": content, "chat_history": chat_history}):
