@@ -2,15 +2,16 @@ from typing import List
 
 from fastapi import APIRouter
 from models.database_models.alcoholic import Alcohol
-from connections.mongodb.schema.schemas import pack_serialize
 from connections.mongodb.mongodb_client import collection_alcohol
 from bson import ObjectId
 
 
-mongodb_router = APIRouter()
+mongodb_router = APIRouter(
+    prefix='/mongo'
+)
 
 
-@mongodb_router.get('/mongo/get_alcohol', response_model=List[Alcohol])
+@mongodb_router.get('/get_alcohol', response_model=List[Alcohol])
 async def get_alcohols() -> List[Alcohol]:
     alcohols = collection_alcohol.find()
     alcohols = [Alcohol.model_validate(al) for al in alcohols]
@@ -18,12 +19,12 @@ async def get_alcohols() -> List[Alcohol]:
     return alcohols
 
 
-@mongodb_router.post('/mongo/add_alcohol')
+@mongodb_router.post('/add_alcohol')
 async def add_alcohol(alcohol: Alcohol) -> None:
     collection_alcohol.insert_one(dict(alcohol))
 
 
-@mongodb_router.put('/mongo/update_alcohol/{id}')
+@mongodb_router.put('/update_alcohol/{id}')
 async def update_alcohol(id: str, alcohol: Alcohol) -> None:
     collection_alcohol.find_one_and_update({'_id': ObjectId(id)}, {'$set': dict(alcohol)})
 
