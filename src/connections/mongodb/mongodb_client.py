@@ -1,9 +1,7 @@
 from pymongo.mongo_client import MongoClient
 
-uri = "mongodb+srv://admin:lonelyltdcompany@alcohol.dzabi1t.mongodb.net/?retryWrites=true&w=majority&appName=Alcohol"
+db_client = MongoClient('mongodb+srv://lonelyltdcompany:20240424@alcoholic.whtr0ut.mongodb.net/?retryWrites=true&w=majority&appName=alcoholic')
 
-db_client = MongoClient(uri)
+db = db_client.
 
-db = db_client.alcoholic
-
-collection_alcohol = db['alcohol']
+collection_beverage = db['beverage']

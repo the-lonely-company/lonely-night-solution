@@ -3,6 +3,6 @@ from langchain_groq import ChatGroq
 
 llm = ChatGroq(
     temperature=1, 
-    groq_api_key="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",
+    groq_api_key="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",
     model_name="llama3-70b-8192"
 )
