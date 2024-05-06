@@ -23,7 +23,7 @@ os.environ["LANGCHAIN_PROJECT"]="Alcohol"
 
 
 app = FastAPI(
-    title='Alcohol Backend'
+    title='Lonely Backend'
 )
 app.add_middleware(
     CORSMiddleware,

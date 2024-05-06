@@ -32,6 +32,7 @@ class Beverage(BaseModel):
     winery: str
     label: str
     vintage: int
+    price: float
     rating: Optional[Rating] = None
     region: Region
     sweetness: str
