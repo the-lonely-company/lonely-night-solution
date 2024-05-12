@@ -2,8 +2,9 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesP
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.runnables import RunnableLambda
 
+from connections.mongodb.mongodb_client import collection_beverage
+from models.database_models.alcoholic import Beverage
 from models.api_models import WinePreference
-from chains.utils import get_beverage
 from llms import llm
 
 
@@ -27,5 +28,22 @@ prompt = ChatPromptTemplate.from_messages(
         )
     ]
 )
+
+def get_beverage(wine_preference: dict):
+    from loguru import logger; logger.debug(wine_preference)
+
+    query = {
+        'sweetness': wine_preference['sweetness'],
+        'acidity': wine_preference['acidity'],
+        'body': wine_preference['body']
+    }
+
+    response = collection_beverage.find(query)
+
+    beverages = [Beverage.model_validate(res) for res in response]
+
+    logger.debug(beverages)
+
+    return beverages
 
 suggestion_chain = prompt | llm | parser | RunnableLambda(get_beverage)
