@@ -15,8 +15,8 @@ mongodb_router = APIRouter(
 
 @mongodb_router.get('/get_alcohol', response_model=List[Beverage])
 async def get_alcohols() -> List[Beverage]:
-    beverages = collection_beverage.find()
-    beverages = [Beverage.model_validate(beverage) for beverage in beverages]
+    response = collection_beverage.find()
+    beverages = [Beverage.model_validate(res) for res in response]
 
     return beverages
 

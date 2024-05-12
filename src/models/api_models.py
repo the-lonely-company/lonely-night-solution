@@ -12,6 +12,6 @@ class Alcohol(CamelModel):
 
 
 class WinePreference(BaseModel):
-    sweetness: str = Field(description='sweetness of the wine: low, medium or high')
+    sweetness: str = Field(description='sweetness of the wine: dry, medium or high')
     acidity: str = Field(description='acidity of the wine: low, medium or high')
     body: str = Field(description='body of the wine: light, medium or bold')
