@@ -19,7 +19,6 @@ prompt = ChatPromptTemplate.from_messages(
                 partial_variables={'format_instructions': parser.get_format_instructions()}
             )
         ),
-        MessagesPlaceholder(variable_name='chat_history'),
         HumanMessagePromptTemplate(
             prompt=PromptTemplate(
                 template='Request: {content}',
