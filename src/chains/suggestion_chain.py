@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnableLambda
 from connections.mongodb.mongodb_client import collection_beverage
 from models.database_models.alcoholic import Beverage
 from models.api_models import WinePreference
-from llms import llm
+from brains.llms import llm
 
 
 parser = JsonOutputParser(pydantic_object=WinePreference)

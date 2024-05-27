@@ -4,10 +4,10 @@ from pydantic import BaseModel
 from models.camel_model import CamelModel
 
 
-class Turn(BaseModel):
-    party: str
+class Message(BaseModel):
+    role: str
     content: str    
 
-class Message(CamelModel):
+class Messages(CamelModel):
     content: str
-    chat_history: Optional[List[Turn]]
+    chat_history: Optional[List[Message]]

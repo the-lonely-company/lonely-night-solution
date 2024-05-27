@@ -2,7 +2,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesP
 from langchain_core.output_parsers import JsonOutputParser
 
 from models.api_models import Alcohol
-from llms import llm
+from brains import llm
 
 
 parser = JsonOutputParser(pydantic_object=Alcohol)

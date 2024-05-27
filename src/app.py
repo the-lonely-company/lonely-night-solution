@@ -10,10 +10,11 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from chains.full_chain import full_chain
-from models.request_models import Message, Turn
+from models.request_models import Messages, Message
 from models.api_models import Alcohol
 from connections.mongodb.mongodb_client import db_client
 from routers.mongodb import mongodb_router
+from agents.customer_service_assistant import customer_service_assistant
 
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -42,20 +43,20 @@ def gen(content: str, chat_history: List) -> str:
         yield chunk
 
 
-def convert_to_langchain_message(turn: Turn):
-    logger.debug(turn.content)
-    if turn.party == 'ai':
-        return AIMessage(content=turn.content)
+# def convert_to_langchain_message(turn: Turn):
+#     logger.debug(turn.content)
+#     if turn.party == 'ai':
+#         return AIMessage(content=turn.content)
     
-    return HumanMessage(content=turn.content)
+#     return HumanMessage(content=turn.content)
 
 
 @app.post("/stream")
-def stream(message: Message, request: Request):
+def stream(message: Messages, request: Request):
     content = message.content
     chat_history = [
-        convert_to_langchain_message(turn)
-        for turn in message.chat_history
+        # convert_to_langchain_message(turn)
+        # for turn in message.chat_history
     ]
 
     logger.info(request.headers)
@@ -65,15 +66,9 @@ def stream(message: Message, request: Request):
     return StreamingResponse(gen_init, media_type="text/event-stream")
 
 @app.post("/invoke")
-def invoke(message: Message, request: Request):
-    content = message.content
-    chat_history = [
-        convert_to_langchain_message(turn)
-        for turn in message.chat_history
-    ]
-
+def invoke(messages: List[Message], request: Request):
     logger.info(request.headers)
 
-    response = full_chain.invoke({'content': content, 'chat_history': chat_history})
+    response = customer_service_assistant.respond(messages)
 
     return response

@@ -3,7 +3,7 @@ from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers.string import StrOutputParser
 
 from chains.utils import route
-from llms import llm
+from brains.llms import llm
 
 
 gate_chain = (

@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers.string import StrOutputParser
 
-from llms import llm
+from brains.llms import llm
 
 
 prompt = ChatPromptTemplate.from_messages(
