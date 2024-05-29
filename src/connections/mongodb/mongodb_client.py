@@ -1,3 +1,4 @@
+import json
 from pymongo.mongo_client import MongoClient
 from loguru import logger
 
@@ -38,7 +39,7 @@ def vector_search(embedding):
     ]
 
     result = beverages_inventory.aggregate(pipeline)
-    labels = [dict(r) for r in result]
+    labels = [json.dumps(r) for r in result]
 
     logger.debug(result)
 
