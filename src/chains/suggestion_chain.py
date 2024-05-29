@@ -2,7 +2,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesP
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.runnables import RunnableLambda
 
-from connections.mongodb.mongodb_client import collection_beverage
+from connections.mongodb.mongodb_client import beverages_inventory
 from models.database_models.alcoholic import Beverage
 from models.api_models import WinePreference
 from brains.llms import llm
@@ -37,7 +37,7 @@ def get_beverage(wine_preference: dict):
         'body': wine_preference['body']
     }
 
-    response = collection_beverage.find(query)
+    response = beverages_inventory.find(query)
 
     beverages = [Beverage.model_validate(res) for res in response]
 

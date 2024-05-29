@@ -3,6 +3,7 @@ from loguru import logger
 
 from brains.llms import groq_client
 from brains.embedding_models import embedding_model
+from connections.mongodb.mongodb_client import vector_search
 from models.api_models import AssistantResponse
 from agents.prompts import SYS_PROMPT
 
@@ -18,13 +19,16 @@ class CustomerServiceAssistant():
         ]
 
     def recommend(self, assistant_response: AssistantResponse):
-        if assistant_response.price_negotiating:
-            return f'CARD INFO about {assistant_response.preference} PRICE {assistant_response.budget}'
+        # if assistant_response.price_negotiating:
+        #     return f'CARD INFO about {assistant_response.preference} PRICE {assistant_response.budget}'
             
-        return f'CARD INFO about {assistant_response.preference}'
+        embedding = embedding_model.embed(assistant_response.characteristic)
+        recommendation = vector_search(embedding)
+
+        return recommendation
 
     def format_output(self, assistant_response: AssistantResponse):
-        if assistant_response.recommend:
+        if assistant_response.recommend_status:
             return assistant_response.content, self.recommend(assistant_response)
 
         return assistant_response.content
@@ -49,6 +53,8 @@ class CustomerServiceAssistant():
         assistant_response = AssistantResponse.model_validate(
             json.loads(completion)
         )
+
+        logger.debug(assistant_response)
 
         return self.format_output(assistant_response)
 

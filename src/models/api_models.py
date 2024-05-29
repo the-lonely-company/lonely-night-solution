@@ -26,4 +26,4 @@ class AssistantResponse(BaseModel):
     budget: Optional[float] = Field(description="user's budget in hkd, null if budget cannot be guessed")
     price_negotiating: Optional[bool] = Field(description='is user negotiating price or not')
     content : str = Field(description='content to respond to user query after analysis')
-    recommend: bool = Field(description='did you choose to recommend drinks or not')
+    recommend_status: bool = Field(description='did you choose to recommend drinks or not')
