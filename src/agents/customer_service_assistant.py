@@ -1,10 +1,13 @@
+from typing import List
+
 import json
 from loguru import logger
+from pydantic import parse_obj_as
 
 from brains.llms import groq_client
 from brains.embedding_models import embedding_model
 from connections.mongodb.mongodb_client import vector_search
-from models.api_models import AssistantResponse
+from models.api_models import AssistantResponse, Recommendation
 from agents.prompts import SYS_PROMPT
 
 
@@ -22,16 +25,22 @@ class CustomerServiceAssistant():
         # if assistant_response.price_negotiating:
         #     return f'CARD INFO about {assistant_response.preference} PRICE {assistant_response.budget}'
             
-        embedding = embedding_model.embed(assistant_response.characteristic)
+        embedding = embedding_model.embed(f'{assistant_response.preference}, {assistant_response.characteristic}')
         recommendation = vector_search(embedding)
 
         return recommendation
 
     def format_output(self, assistant_response: AssistantResponse):
         if assistant_response.recommend_status:
-            return assistant_response.content, self.recommend(assistant_response)
+            return {
+                'assistant_response': assistant_response,
+                'recommendation': self.recommend(assistant_response)
+            }
 
-        return assistant_response.content
+        return {
+            'assistant_response': assistant_response,
+           'recommendation': []
+        }
     
     def get_completion(self, messages):
         response = self.llm_client.chat.completions.create(

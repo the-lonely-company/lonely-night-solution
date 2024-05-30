@@ -27,3 +27,16 @@ class AssistantResponse(BaseModel):
     price_negotiating: Optional[bool] = Field(description='is user negotiating price or not')
     content : str = Field(description='content to respond to user query after analysis')
     recommend_status: bool = Field(description='did you choose to recommend drinks or not')
+
+
+class Recommendation(CamelModel):
+    category: str = Field(description='category of the alcohol')
+    sub_category: str = Field(description='sub-category of the alcohol')
+    region: str = Field(description='region of the alcohol')
+    winery: str = Field(description='winery of the alcohol')
+    vintage: int = Field(description='vintage of the alcohol')
+    label: str = Field(description='label of the alcohol')
+    volume: float = Field(description='volume of the alcohol')
+    quantity: int = Field(description='quantity of the alcohol')
+    price: float = Field(description='price of the alcohol')
+    description: str = Field(description='description of the alcohol')

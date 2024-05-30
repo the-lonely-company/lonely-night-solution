@@ -39,9 +39,7 @@ def vector_search(embedding):
     ]
 
     result = beverages_inventory.aggregate(pipeline)
-    labels = [json.dumps(r) for r in result]
-
-    logger.debug(result)
+    labels = [json.loads(json.dumps(r)) for r in result]
 
     logger.debug(labels)
 
