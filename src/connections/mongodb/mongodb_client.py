@@ -12,8 +12,8 @@ def vector_search(embedding):
     pipeline = [
         {
             '$vectorSearch': {
-                'index': 'vector_index', 
-                'path': 'EMBEDDING', 
+                'index': 'description_embedding_vector_index', 
+                'path': 'embedding', 
                 'queryVector': embedding,
                 'numCandidates': 50, 
                 'limit': 4
@@ -21,16 +21,16 @@ def vector_search(embedding):
         }, {
             '$project': {
                 '_id': 0, 
-                'CATEGORY': 1,
-                'SUB_CATEGORY': 1,
-                'REGION': 1,
-                'WINERY': 1,
-                'VINTAGE': 1,
-                'LABEL': 1, 
-                'VOLUME': 1,
-                'QUANTITY': 1,
-                'PRICE': 1,
-                'DESCRIPTION': 1,
+                'category': 1,
+                'sub_catergory': 1,
+                'region': 1,
+                'winery': 1,
+                'vintage': 1,
+                'label': 1, 
+                'volume': 1,
+                'quantity': 1,
+                'price': 1,
+                'description': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
                 }
@@ -39,8 +39,8 @@ def vector_search(embedding):
     ]
 
     result = beverages_inventory.aggregate(pipeline)
-    labels = [json.loads(json.dumps(r)) for r in result]
+    stocks = [{k.upper(): v for k, v in dict(r).items()} for r in result]
 
-    logger.debug(labels)
+    logger.debug(stocks)
 
-    return labels
+    return stocks
