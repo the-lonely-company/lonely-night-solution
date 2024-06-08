@@ -22,7 +22,7 @@ def vector_search(embedding):
             '$project': {
                 '_id': 0, 
                 'category': 1,
-                'sub_catergory': 1,
+                'sub_category': 1,
                 'region': 1,
                 'winery': 1,
                 'vintage': 1,
@@ -31,7 +31,7 @@ def vector_search(embedding):
                 'quantity': 1,
                 'price': 1,
                 'description': 1,
-                'score': {
+                'similarity_score': {
                     '$meta': 'vectorSearchScore'
                 }
             }
@@ -39,7 +39,7 @@ def vector_search(embedding):
     ]
 
     result = beverages_inventory.aggregate(pipeline)
-    stocks = [{k.upper(): v for k, v in dict(r).items()} for r in result]
+    stocks = [dict(r) for r in result]
 
     logger.debug(stocks)
 

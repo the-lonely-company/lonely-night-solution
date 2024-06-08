@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List
+import math
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from models.camel_model import CamelModel
 
@@ -29,14 +30,28 @@ class AssistantResponse(BaseModel):
     recommend_status: bool = Field(description='did you choose to recommend drinks or not')
 
 
-class Recommendation(CamelModel):
-    category: str = Field(description='category of the alcohol')
-    sub_category: str = Field(description='sub-category of the alcohol')
-    region: str = Field(description='region of the alcohol')
-    winery: str = Field(description='winery of the alcohol')
-    vintage: int = Field(description='vintage of the alcohol')
-    label: str = Field(description='label of the alcohol')
-    volume: float = Field(description='volume of the alcohol')
-    quantity: int = Field(description='quantity of the alcohol')
-    price: float = Field(description='price of the alcohol')
-    description: str = Field(description='description of the alcohol')
+class Stock(BaseModel):
+    category: str
+    sub_category: str
+    region: str
+    winery: str
+    vintage: Optional[int] = None
+    label: str
+    volume: float
+    quantity: int
+    price: Optional[float] = None
+    description: str
+    similarity_score: float
+
+    @field_validator('*', mode='before')
+    def split_str(cls, v):
+        if isinstance(v, float):
+            if math.isnan(v):
+                return None
+            return v
+        return v   
+
+
+class InvokeResponse(BaseModel):
+    assistant_response: AssistantResponse
+    recommendation: List[Optional[Stock]]

@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from chains.full_chain import full_chain
 from models.request_models import Messages, Message
-from models.api_models import Alcohol
+from models.api_models import InvokeResponse
 from connections.mongodb.mongodb_client import db_client
 from routers.mongodb import mongodb_router
 from agents.customer_service_assistant import customer_service_assistant
@@ -65,8 +65,8 @@ def stream(message: Messages, request: Request):
 
     return StreamingResponse(gen_init, media_type="text/event-stream")
 
-@app.post("/invoke")
-def invoke(messages: List[Message], request: Request):
+@app.post("/invoke", response_model=InvokeResponse)
+def invoke(messages: List[Message], request: Request) -> InvokeResponse:
     logger.info(request.headers)
 
     response = customer_service_assistant.respond(messages)

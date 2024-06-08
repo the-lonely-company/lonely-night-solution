@@ -7,7 +7,7 @@ from pydantic import parse_obj_as
 from brains.llms import groq_client
 from brains.embedding_models import embedding_model
 from connections.mongodb.mongodb_client import vector_search
-from models.api_models import AssistantResponse, Recommendation
+from models.api_models import AssistantResponse, Stock, InvokeResponse
 from agents.prompts import SYS_PROMPT
 
 
@@ -21,26 +21,27 @@ class CustomerServiceAssistant():
             {'role': 'system', 'content': self.system_prompt}
         ]
 
-    def recommend(self, assistant_response: AssistantResponse):
+    def recommend(self, assistant_response: AssistantResponse) -> List[Stock]:
         # if assistant_response.price_negotiating:
         #     return f'CARD INFO about {assistant_response.preference} PRICE {assistant_response.budget}'
             
         embedding = embedding_model.embed(f'{assistant_response.preference}, {assistant_response.characteristic}')
-        recommendation = vector_search(embedding)
+        stocks = parse_obj_as(List[Stock], vector_search(embedding))
 
-        return recommendation
+        return stocks
 
-    def format_output(self, assistant_response: AssistantResponse):
+    def format_output(self, assistant_response: AssistantResponse) -> InvokeResponse:
         if assistant_response.recommend_status:
-            return {
-                'assistant_response': assistant_response,
-                'recommendation': self.recommend(assistant_response)
-            }
+            recommendation = self.recommend(assistant_response)
+        else: 
+            recommendation = []
 
-        return {
-            'assistant_response': assistant_response,
-           'recommendation': []
-        }
+        return InvokeResponse.model_validate(
+            {
+                'assistant_response': assistant_response,
+                'recommendation': recommendation
+            }
+        )
     
     def get_completion(self, messages):
         response = self.llm_client.chat.completions.create(
@@ -56,8 +57,10 @@ class CustomerServiceAssistant():
     
         return response.choices[0].message.content
 
-    def respond(self, messages):
+    def respond(self, messages) -> InvokeResponse:
         completion = self.get_completion(messages)
+
+        logger.debug(completion)
 
         assistant_response = AssistantResponse.model_validate(
             json.loads(completion)
