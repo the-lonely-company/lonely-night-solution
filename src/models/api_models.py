@@ -58,4 +58,4 @@ class StockWithSimilarityScore(Stock):
 
 class InvokeResponse(BaseModel):
     assistant_response: AssistantResponse
-    recommendation: List[Optional[Stock]]
+    recommendation: List[Optional[StockWithSimilarityScore]]
