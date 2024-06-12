@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 import math
 
 from pydantic import BaseModel, Field, field_validator
@@ -31,6 +31,7 @@ class AssistantResponse(BaseModel):
 
 
 class Stock(BaseModel):
+    code: int
     category: str
     sub_category: str
     region: str
@@ -41,7 +42,7 @@ class Stock(BaseModel):
     quantity: int
     price: Optional[float] = None
     description: str
-    similarity_score: float
+    image: str = None
 
     @field_validator('*', mode='before')
     def split_str(cls, v):
@@ -50,6 +51,9 @@ class Stock(BaseModel):
                 return None
             return v
         return v   
+
+class StockWithSimilarityScore(Stock):
+    similarity_score: float
 
 
 class InvokeResponse(BaseModel):

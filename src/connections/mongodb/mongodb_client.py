@@ -21,6 +21,7 @@ def vector_search(embedding):
         }, {
             '$project': {
                 '_id': 0, 
+                'code': 1,
                 'category': 1,
                 'sub_category': 1,
                 'region': 1,
@@ -31,6 +32,7 @@ def vector_search(embedding):
                 'quantity': 1,
                 'price': 1,
                 'description': 1,
+                'image': 1,
                 'similarity_score': {
                     '$meta': 'vectorSearchScore'
                 }

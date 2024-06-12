@@ -1,36 +1,36 @@
-from typing import List
-
 from fastapi import APIRouter
-from models.database_models.alcoholic import Beverage
+from models.api_models import Stock
 from connections.mongodb.mongodb_client import beverages_inventory
-from bson import ObjectId
-
-from loguru import logger
 
 
 mongodb_router = APIRouter(
-    prefix='/mongo'
+    prefix='/mongo',
+    tags=['Database']
 )
 
 
-@mongodb_router.get('/get_alcohol', response_model=List[Beverage])
-async def get_alcohols() -> List[Beverage]:
-    response = beverages_inventory.find()
-    beverages = [Beverage.model_validate(res) for res in response]
+@mongodb_router.get('/get_alcohol', response_model=Stock)
+async def get_alcohols(category: str, code: int) -> Stock:
+    query = {'category': category, 'code': code}
 
-    return beverages
+    projection = {
+        'code': 1,
+        'category': 1,
+        'sub_category': 1,
+        'region': 1,
+        'winery': 1,
+        'vintage': 1,
+        'label': 1,
+        'volume': 1,
+        'quantity': 1,
+        'price': 1,
+        'description': 1,
+        'image': 1
+    }
 
+    item = beverages_inventory.find_one(query, projection)
 
-@mongodb_router.post('/add_alcohol')
-async def add_alcohol(beverage: Beverage) -> None:
-    beverages_inventory.insert_one(beverage.dict())
-
-
-@mongodb_router.put('/update_alcohol/{id}')
-async def update_alcohol(id: str, beverage: Beverage) -> None:
-    beverages_inventory.find_one_and_update({'_id': ObjectId(id)}, {'$set': dict(beverage)})
-
-
-@mongodb_router.delete('/{id}')
-async def delete_alcohol(id: str) -> None:
-    beverages_inventory.find_one_and_delete({'_id': ObjectId(id)})
+    if item:
+        return Stock(**item)
+    else:
+        return f'No stock with category {category} and code {code} found'
