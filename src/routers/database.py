@@ -3,13 +3,13 @@ from models.api_models import Stock
 from connections.mongodb.mongodb_client import beverages_inventory
 
 
-mongodb_router = APIRouter(
-    prefix='/mongo',
+db_router = APIRouter(
+    prefix='/database',
     tags=['Database']
 )
 
 
-@mongodb_router.get('/get_alcohol', response_model=Stock)
+@db_router.get('/get_stock', response_model=Stock)
 async def get_alcohols(category: str, code: int) -> Stock:
     query = {'category': category, 'code': code}
 

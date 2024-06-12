@@ -13,7 +13,7 @@ from chains.full_chain import full_chain
 from models.request_models import Messages, Message
 from models.api_models import InvokeResponse
 from connections.mongodb.mongodb_client import db_client
-from routers.mongodb import mongodb_router
+from routers.database import db_router
 from agents.customer_service_assistant import customer_service_assistant
 
 
@@ -35,7 +35,7 @@ app.add_middleware(
 )
 
 
-app.include_router(mongodb_router)
+app.include_router(db_router)
 
 
 def gen(content: str, chat_history: List) -> str:
