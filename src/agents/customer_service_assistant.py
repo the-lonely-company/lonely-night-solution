@@ -66,8 +66,6 @@ class CustomerServiceAssistant():
             json.loads(completion)
         )
 
-        logger.debug(assistant_response)
-
         return self.format_output(assistant_response)
 
 

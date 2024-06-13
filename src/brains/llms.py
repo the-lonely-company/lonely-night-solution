@@ -4,10 +4,10 @@ from groq import Groq
 
 llm = ChatGroq(
     temperature=1, 
-    groq_api_key="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",
+    groq_api_key="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",
     model_name="llama3-70b-8192"
 )
 
 groq_client = Groq(
-    api_key='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'
+    api_key='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'
 )

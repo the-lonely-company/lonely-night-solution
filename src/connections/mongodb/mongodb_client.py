@@ -43,6 +43,6 @@ def vector_search(embedding):
     result = beverages_inventory.aggregate(pipeline)
     stocks = [dict(r) for r in result]
 
-    logger.debug(stocks)
+    logger.debug([stock.keys() for stock in stocks])
 
     return stocks
