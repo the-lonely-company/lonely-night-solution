@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers.string import StrOutputParser
 
-from brains.llms import llm
+from brains.llms import llm_client
 
 
 prompt = ChatPromptTemplate.from_messages(
@@ -24,6 +24,6 @@ general_chain = (
         'chat_history': lambda x: x['chat_history'] if x['chat_history'] else []
     }
     | prompt
-    | llm
+    | llm_client
     | StrOutputParser()
 )

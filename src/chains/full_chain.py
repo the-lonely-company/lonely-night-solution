@@ -3,14 +3,14 @@ from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers.string import StrOutputParser
 
 from chains.utils import route
-from brains.llms import llm
+from brains.llms import llm_client
 
 
 gate_chain = (
     PromptTemplate.from_template(
         'Given the user query content below, classify it as either being about `alcohol suggestion` or `Other`. Do not respond with more than two words.\n{content}'
     )
-    | llm
+    | llm_client
     | StrOutputParser()
 )
 

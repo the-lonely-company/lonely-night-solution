@@ -2,7 +2,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesP
 from langchain_core.output_parsers import JsonOutputParser
 
 from models.api_models import Alcohol
-from brains import llm
+from brains import llm_client
 
 
 parser = JsonOutputParser(pydantic_object=Alcohol)
@@ -26,4 +26,4 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-suggestion_chain = prompt | llm | parser
+suggestion_chain = prompt | llm_client | parser

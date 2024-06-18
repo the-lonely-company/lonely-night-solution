@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnableLambda
 from connections.mongodb.mongodb_client import beverages_inventory
 from models.database_models.alcoholic import Beverage
 from models.api_models import WinePreference
-from brains.llms import llm
+from brains.llms import llm_client
 
 
 parser = JsonOutputParser(pydantic_object=WinePreference)
@@ -45,4 +45,4 @@ def get_beverage(wine_preference: dict):
 
     return beverages
 
-suggestion_chain = prompt | llm | parser | RunnableLambda(get_beverage)
+suggestion_chain = prompt | llm_client | parser | RunnableLambda(get_beverage)

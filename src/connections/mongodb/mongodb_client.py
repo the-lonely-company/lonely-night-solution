@@ -8,6 +8,39 @@ db = db_client.beverages
 beverages_inventory = db['inventory']
 
 
+def get_beverages_by_query(query):
+    pipeline = [
+        {
+            '$match': query
+        }, {
+            '$project': {
+                '_id': 0, 
+                'code': 1,
+                'category': 1,
+                'sub_category': 1,
+                'region': 1,
+                'winery': 1,
+                'vintage': 1,
+                'label': 1, 
+                'volume': 1,
+                'quantity': 1,
+                'price': 1,
+                'description': 1,
+                'image': 1
+            }
+        }, {
+            '$limit': 4
+        }
+    ]
+
+    result = beverages_inventory.aggregate(pipeline)
+    stocks = [dict(r) for r in result]
+
+    logger.debug([stock.keys() for stock in stocks])
+
+    return stocks
+
+
 def vector_search(embedding):
     pipeline = [
         {

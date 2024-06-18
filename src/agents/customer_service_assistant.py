@@ -4,35 +4,37 @@ import json
 from loguru import logger
 from pydantic import parse_obj_as
 
-from brains.llms import groq_client
+from brains.llms import llm
 from brains.embedding_models import embedding_model
-from connections.mongodb.mongodb_client import vector_search
-from models.api_models import AssistantResponse, StockWithSimilarityScore, InvokeResponse
-from agents.prompts import SYS_PROMPT
+from connections.mongodb.mongodb_client import vector_search, get_beverages_by_query
+from models.api_models import AssistantResponse, Stock, StockWithSimilarityScore, InvokeResponse
+from agents.prompts import SYS_PROMPT, TEXT_TO_QUERY_PROMPT
 
 
 class CustomerServiceAssistant():
     def __init__(self):
-        self.llm_client = groq_client
-        self.llm = 'llama3-70b-8192'
+        self.llm = llm
         self.embedding_model = embedding_model
-        self.system_prompt = SYS_PROMPT
-        self.messages = [
-            {'role': 'system', 'content': self.system_prompt}
-        ]
 
-    def recommend(self, assistant_response: AssistantResponse) -> List[StockWithSimilarityScore]:
-        # if assistant_response.price_negotiating:
-        #     return f'CARD INFO about {assistant_response.preference} PRICE {assistant_response.budget}'
-            
+    def recommend(self, assistant_response: AssistantResponse, messages) -> List[StockWithSimilarityScore]:
+        if assistant_response.inventory_query:
+            messages_with_sys = self.format_messages(TEXT_TO_QUERY_PROMPT, messages)
+            completion = self.llm.get_completion(messages_with_sys)
+            logger.debug(completion)
+
+            query = json.loads(completion)
+            stocks = parse_obj_as(List[Stock], get_beverages_by_query(query))
+
+            return stocks
+
         embedding = embedding_model.embed(f'{assistant_response.preference}, {assistant_response.characteristic}')
         stocks = parse_obj_as(List[StockWithSimilarityScore], vector_search(embedding))
 
         return stocks
 
-    def format_output(self, assistant_response: AssistantResponse) -> InvokeResponse:
+    def format_output(self, assistant_response: AssistantResponse, messages) -> InvokeResponse:
         if assistant_response.recommend_status:
-            recommendation = self.recommend(assistant_response)
+            recommendation = self.recommend(assistant_response, messages)
         else: 
             recommendation = []
 
@@ -43,22 +45,14 @@ class CustomerServiceAssistant():
             }
         )
     
-    def get_completion(self, messages):
-        response = self.llm_client.chat.completions.create(
-            model=self.llm,
-            messages=self.messages + messages,
-            temperature=1,
-            max_tokens=1024,
-            top_p=1,
-            stream=False,
-            response_format={"type": "json_object"},
-            stop=None,
-        )
+    def format_messages(self, prompt, messages):
+        return [
+            {'role': 'system', 'content': prompt}
+        ] + messages
     
-        return response.choices[0].message.content
-
     def respond(self, messages) -> InvokeResponse:
-        completion = self.get_completion(messages)
+        messages_with_sys = self.format_messages(SYS_PROMPT, messages)
+        completion = self.llm.get_completion(messages_with_sys)
 
         logger.debug(completion)
 
@@ -66,7 +60,7 @@ class CustomerServiceAssistant():
             json.loads(completion)
         )
 
-        return self.format_output(assistant_response)
+        return self.format_output(assistant_response, messages)
 
 
 customer_service_assistant = CustomerServiceAssistant()

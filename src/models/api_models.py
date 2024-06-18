@@ -1,4 +1,4 @@
-from typing import Optional, List, Any
+from typing import Optional, List, Union
 import math
 
 from pydantic import BaseModel, Field, field_validator
@@ -21,13 +21,13 @@ class WinePreference(BaseModel):
 
 
 class AssistantResponse(BaseModel):
-    preference: Optional[str] = Field(description="user's preference on alcoholic beverages or favourite brands, null if user preference is open or cannot be identified")
-    needs: Optional[str] = Field(description="user's needs on alcoholic beverages, null if no specifc needs")
-    characteristic: Optional[str] = Field(description='characteristic, brands or names of drinks that matches user preference and needs')
-    budget: Optional[float] = Field(description="user's budget in hkd, null if budget cannot be guessed")
-    price_negotiating: Optional[bool] = Field(description='is user negotiating price or not')
-    content : str = Field(description='content to respond to user query after analysis')
-    recommend_status: bool = Field(description='did you choose to recommend drinks or not')
+    preference: Optional[str] = Field(description="user's preference on alcoholic beverages or favourite brands, null if user preference is open or cannot be identified.")
+    needs: Optional[str] = Field(description="user's needs on alcoholic beverages, null if no specifc needs.")
+    characteristic: Optional[str] = Field(description='characteristic, brands or names of drinks that matches user preference and needs.')
+    budget: Optional[float] = Field(description="user's budget in hkd, null if budget cannot be guessed.")
+    inventory_query: bool = Field(description="is user's question specifically related to looking for products from your inventory quantitatively?")
+    content : str = Field(description='content to respond to user query after analysis.')
+    recommend_status: bool = Field(description='did you choose to recommend drinks or not?')
 
 
 class Stock(BaseModel):
@@ -58,4 +58,4 @@ class StockWithSimilarityScore(Stock):
 
 class InvokeResponse(BaseModel):
     assistant_response: AssistantResponse
-    recommendation: List[Optional[StockWithSimilarityScore]]
+    recommendation: List[Optional[Union[StockWithSimilarityScore, Stock]]]
