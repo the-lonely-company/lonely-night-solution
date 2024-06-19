@@ -43,6 +43,7 @@ class Stock(BaseModel):
     price: Optional[float] = None
     description: str
     image: str = None
+    similarity_score: Optional[float] = None
 
     @field_validator('*', mode='before')
     def split_str(cls, v):
@@ -52,10 +53,7 @@ class Stock(BaseModel):
             return v
         return v   
 
-class StockWithSimilarityScore(Stock):
-    similarity_score: float
-
 
 class InvokeResponse(BaseModel):
     assistant_response: AssistantResponse
-    recommendation: List[Optional[Union[StockWithSimilarityScore, Stock]]]
+    recommendation: List[Optional[Stock]]

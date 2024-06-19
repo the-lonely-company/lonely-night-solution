@@ -7,7 +7,7 @@ from pydantic import parse_obj_as
 from brains.llms import llm
 from brains.embedding_models import embedding_model
 from connections.mongodb.mongodb_client import vector_search, get_beverages_by_query
-from models.api_models import AssistantResponse, Stock, StockWithSimilarityScore, InvokeResponse
+from models.api_models import AssistantResponse, Stock, InvokeResponse
 from agents.prompts import SYS_PROMPT, TEXT_TO_QUERY_PROMPT
 
 
@@ -16,7 +16,7 @@ class CustomerServiceAssistant():
         self.llm = llm
         self.embedding_model = embedding_model
 
-    def recommend(self, assistant_response: AssistantResponse, messages) -> List[StockWithSimilarityScore]:
+    def recommend(self, assistant_response: AssistantResponse, messages) -> List[Stock]:
         if assistant_response.inventory_query:
             messages_with_sys = self.format_messages(TEXT_TO_QUERY_PROMPT, messages)
             completion = self.llm.get_completion(messages_with_sys)
@@ -28,7 +28,7 @@ class CustomerServiceAssistant():
             return stocks
 
         embedding = embedding_model.embed(f'{assistant_response.preference}, {assistant_response.characteristic}')
-        stocks = parse_obj_as(List[StockWithSimilarityScore], vector_search(embedding))
+        stocks = parse_obj_as(List[Stock], vector_search(embedding))
 
         return stocks
 
