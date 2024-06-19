@@ -42,10 +42,13 @@ Give an input question, create a syntactically correct query.
 Examples to follow:
 
 question: Any mouton is after 1993 and from Champagne?
-answer: {"region": "Champagne", "winery": "Chateau Mouton Rothschild", "vintage": {"$gt": 1993} }
+answer: {"region": "Champagne", "winery": "Chateau Mouton Rothschild", "vintage": {"$gt": 1993}}
 
 question: Any champagne within 2000 dollars?
 answer: {"region": "Champagne", "price": {"$lte": 2000}}
+
+question: Any wine around 2000 dollars and from around 1990?
+answer: { "category": "wine", "price": {"$gte": 1900, "$lte": 2100}, "vintage": {"$gte": 1985, "$lte": 1995}}
 
 Only use tables listed below. Collection 'Inventory' stores the data of different alcoholic beverages in inventory. Collection 'Inventory' schema: 
 
