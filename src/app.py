@@ -79,10 +79,10 @@ def invoke(messages: List[Message], request: Request) -> InvokeResponse:
 from fastapi import Depends, FastAPI, HTTPException
 
 from sqlalchemy.orm import Session
-from connections.postgreSQL import crud
+from connections.postgreSQL import postgresql_client
 from models.database_models import postgreSQL_schemas
 from models import postgreSQL_model
-from connections.postgreSQL.database import SessionLocal, engine
+from connections.postgreSQL.postgresql_connection import SessionLocal, engine
 
 postgreSQL_model.Base.metadata.create_all(bind=engine)
 
@@ -97,7 +97,7 @@ def get_db():
 # Get user by user_id
 @app.get("/users/{user_id}", response_model=postgreSQL_schemas.User)
 def read_user(user_id: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, user_id=user_id)
+    db_user = postgresql_client.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
@@ -105,12 +105,12 @@ def read_user(user_id: str, db: Session = Depends(get_db)):
 # Create a new user
 @app.post("/users/", response_model=postgreSQL_schemas.User)
 def create_user(user: postgreSQL_schemas.UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db=db, user=user)
+    return postgresql_client.create_user(db=db, user=user)
 
 # Update an existing user
 @app.put("/users/{user_id}", response_model=postgreSQL_schemas.User)
 def update_user(user_id: str, user: postgreSQL_schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.update_user(db=db, user_id=user_id, user_update=user)
+    db_user = postgresql_client.update_user(db=db, user_id=user_id, user_update=user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
@@ -118,12 +118,12 @@ def update_user(user_id: str, user: postgreSQL_schemas.UserCreate, db: Session =
 # Create a new merchant
 @app.post("/merchants/", response_model=postgreSQL_schemas.Merchant)
 def create_merchant(merchant: postgreSQL_schemas.MerchantCreate, db: Session = Depends(get_db)):
-    return crud.create_merchant(db=db, merchant=merchant)
+    return postgresql_client.create_merchant(db=db, merchant=merchant)
 
 # Update an existing merchant
 @app.put("/merchants/{merchant_id}", response_model=postgreSQL_schemas.Merchant)
 def update_merchant(merchant_id: str, merchant: postgreSQL_schemas.MerchantCreate, db: Session = Depends(get_db)):
-    db_merchant = crud.update_merchant(db=db, merchant_id=merchant_id, merchant_update=merchant)
+    db_merchant = postgresql_client.update_merchant(db=db, merchant_id=merchant_id, merchant_update=merchant)
     if db_merchant is None:
         raise HTTPException(status_code=404, detail="Merchant not found")
     return db_merchant
@@ -131,12 +131,12 @@ def update_merchant(merchant_id: str, merchant: postgreSQL_schemas.MerchantCreat
 # Create a new transaction
 @app.post("/transactions/", response_model=postgreSQL_schemas.Transaction)
 def create_transaction(transaction: postgreSQL_schemas.TransactionCreate, db: Session = Depends(get_db)):
-    return crud.create_transaction(db=db, transaction=transaction)
+    return postgresql_client.create_transaction(db=db, transaction=transaction)
 
 # Update an existing transaction
 @app.put("/transactions/{transaction_id}", response_model=postgreSQL_schemas.Transaction)
 def update_transaction(transaction_id: int, transaction: postgreSQL_schemas.TransactionCreate, db: Session = Depends(get_db)):
-    db_transaction = crud.update_transaction(db=db, transaction_id=transaction_id, transaction_update=transaction)
+    db_transaction = postgresql_client.update_transaction(db=db, transaction_id=transaction_id, transaction_update=transaction)
     if db_transaction is None:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return db_transaction
