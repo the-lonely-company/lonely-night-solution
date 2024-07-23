@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.database_models import postgreSQL_schemas
-from models import postgreSQL_model
+from models import postgresql_model
 from connections.postgreSQL.postgresql_connection import SessionLocal, engine
 from fastapi import Depends, FastAPI
 
@@ -17,7 +17,11 @@ class PostgresqlClient:
 
     # 1. Get user by user_id
     def get_user(self, user_id: str, session: Session = Depends(get_db)):
-        return session.query(postgreSQL_model.User).filter(postgreSQL_model.User.user_id == user_id).first()
+        return session.query(postgresql_model.User).filter(postgresql_model.User.user_id == user_id).first()
+
+postgresqlClient = PostgresqlClient()
+
+
 
     # # 2. Create user
     # def create_user(self, user: postgreSQL_schemas.UserCreate):
