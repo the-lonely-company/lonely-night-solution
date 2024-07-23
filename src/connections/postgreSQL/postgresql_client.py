@@ -16,7 +16,7 @@ class PostgresqlClient:
             db_session.close()
 
     # 1. Get user by user_id
-    def get_user(self, user_id: str, session: Session = Depends(get_db)):
+    def get_user(self, user_id: int, session: Session = Depends(get_db)):
         return session.query(postgresql_model.User).filter(postgresql_model.User.user_id == user_id).first()
 
 postgresqlClient = PostgresqlClient()
