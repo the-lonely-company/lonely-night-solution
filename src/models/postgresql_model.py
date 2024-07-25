@@ -11,7 +11,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(String, unique=True, index=True)
+    user_id = Column(Integer, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     name = Column(String, index=True)
     address = Column(String, index=True)
@@ -30,7 +30,7 @@ class Merchant(Base):
     __tablename__ = "merchants"
 
     id = Column(Integer, primary_key=True)
-    merchant_id = Column(String, unique=True, index=True)
+    merchant_id = Column(Integer, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
     address = Column(String, index=True)
@@ -49,10 +49,10 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True)
-    reference_no = Column(String, unique=True, index=True)
+    reference_no = Column(Integer, unique=True, index=True)
     status = Column(String, index=True)
-    user_id = Column(String, ForeignKey('users.user_id'))
-    merchant_id = Column(String, ForeignKey('merchants.merchant_id'))
+    user_id = Column(Integer, ForeignKey('users.user_id'))
+    merchant_id = Column(Integer, ForeignKey('merchants.merchant_id'))
     amount = Column(Float)
 
     user = relationship("User", back_populates="transactions")
