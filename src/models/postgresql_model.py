@@ -3,57 +3,78 @@ from sqlalchemy.orm import relationship
 
 from connections.postgreSQL.postgresql_connection import Base
 
-class User(Base):
+class Users(Base):
     """
     Represents a User in the system.
     """
 
-    __tablename__ = "users"
+    __tablename__ = "Users"
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, unique=True, index=True)
+    user_id = Column(Integer, primary_key=True, unique=True, index=True)
+    firebase_uid = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     name = Column(String, index=True)
     address = Column(String, index=True)
     phone_number_prefix = Column(String)
     phone_number = Column(String, index=True)
-    birthday = Column(Date)
-    is_active = Column(Boolean, default=True)
-    
-    transactions = relationship("Transaction", back_populates="user")
+    date_of_birth = Column(Date)
+    is_merchant = Column(Boolean, default=False)
+
+    customer_orders = relationship("Customer_Orders", back_populates="Users")
 
 
-class Merchant(Base):
+class Merchants(Base):
     """
     Represents a merchant in the system.
     """
-    __tablename__ = "merchants"
+    __tablename__ = "Merchants"
 
-    id = Column(Integer, primary_key=True)
-    merchant_id = Column(Integer, unique=True, index=True)
+    merchant_id = Column(Integer, primary_key=True, unique=True, index=True)
     email = Column(String, unique=True, index=True)
-    password = Column(String)
     address = Column(String, index=True)
     delivery_fee = Column(Float)
-    phone_number_prefix = Column(String)
-    phone_number = Column(String, index=True)
-    is_active = Column(Boolean, default=True)
-    
-    transactions = relationship("Transaction", back_populates="merchant")
+
+    user_id = Column(Integer, ForeignKey('Users.user_id'), unique=True)
+
+    user = relationship("Users", back_populates="Merchants")
+    customer_orders = relationship("Customer_Orders", back_populates="Merchants")
 
 
-class Transaction(Base):
+class Customer_Orders(Base):
     """
-    Represents a transaction in the system.
+    Represents a order by a customer in the system.
     """
-    __tablename__ = "transactions"
+    __tablename__ = "Customer_Orders"
 
-    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, primary_key=True, unique=True, index=True)
     reference_no = Column(Integer, unique=True, index=True)
     status = Column(String, index=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
-    merchant_id = Column(Integer, ForeignKey('merchants.merchant_id'))
-    amount = Column(Float)
+    date_order_placed = Column(Date)
+    user_id = Column(Integer, ForeignKey('Users.user_id'))
+    merchant_id = Column(Integer, ForeignKey('Merchants.merchant_id'))
+    total_order_amount = Column(Float)
 
-    user = relationship("User", back_populates="transactions")
-    merchant = relationship("Merchant", back_populates="transactions")
+    user = relationship("Users", back_populates="Customer_Orders")
+    merchant = relationship("Merchants", back_populates="Customer_Orders")
+
+class Customer_Orders_Items(Base):
+    """
+    Represents a order item by a customer in the system.
+    """
+    __tablename__ = "Customer_Orders_Items"
+
+    order_id = Column(Integer, ForeignKey(
+        'Customer_Orders.order_id'
+    ),primary_key=True, unique=True, index=True)
+    item_id = Column(Integer, ForeignKey('Product.product_id'))
+    quantity = Column(Integer)
+    
+
+class Product(Base):
+    """
+    Represents a product in the system.
+    """
+    __tablename__ = "Product"
+
+    product_id = Column(Integer, primary_key=True, unique=True, index=True)
+    
