@@ -14,6 +14,7 @@ from models.request_models import Messages, Message
 from models.api_models import InvokeResponse
 from connections.mongodb.mongodb_client import db_client
 from routers.database import db_router
+from routers.postgresql import account_router
 from routers.document import document_router
 from agents.customer_service_assistant import customer_service_assistant
 
@@ -35,8 +36,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(db_router)
+app.include_router(account_router)
 app.include_router(document_router)
 
 
