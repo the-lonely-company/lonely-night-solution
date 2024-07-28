@@ -14,7 +14,7 @@ from models.request_models import Messages, Message
 from models.api_models import InvokeResponse
 from connections.mongodb.mongodb_client import db_client
 from routers.database import db_router
-from routers.postgresql import account_router
+from routers.account import account_router
 from routers.document import document_router
 from agents.customer_service_assistant import customer_service_assistant
 
@@ -44,14 +44,6 @@ app.include_router(document_router)
 def gen(content: str, chat_history: List) -> str:
     for chunk in full_chain.stream({"content": content, "chat_history": chat_history}):
         yield chunk
-
-
-# def convert_to_langchain_message(turn: Turn):
-#     logger.debug(turn.content)
-#     if turn.party == 'ai':
-#         return AIMessage(content=turn.content)
-    
-#     return HumanMessage(content=turn.content)
 
 
 @app.post("/stream")

@@ -2,9 +2,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-class UserBase(BaseModel):
+from models.camel_model import CamelModel
+
+
+class User(BaseModel):
     user_id: int
-    firebase_uid: str
     email: str
     name: Optional[str] = None
     address: Optional[str] = None
@@ -14,18 +16,7 @@ class UserBase(BaseModel):
     is_merchant: Optional[bool] = False
     is_active: Optional[bool] = True
 
-class UserCreate(BaseModel):
-    firebase_uid: str
-    email: str
-    name: str
-
-class User(UserBase):
-    transactions: List['Transaction'] = []
-
-    class Config:
-        orm_mode = True
-
-class MerchantBase(BaseModel):
+class Merchant(BaseModel):
     merchant_id: str
     email: str
     password: str
@@ -35,30 +26,14 @@ class MerchantBase(BaseModel):
     phone_number: Optional[str] = None
     is_active: Optional[bool] = True
 
-class MerchantCreate(MerchantBase):
-    pass
-
-class Merchant(MerchantBase):
-    id: int
-    transactions: List['Transaction'] = []
-
-    class Config:
-        orm_mode = True
-
-class TransactionBase(BaseModel):
+class Transaction(BaseModel):
     reference_no: str
     status: str
     user_id: int
     merchant_id: int
     amount: float
 
-class TransactionCreate(TransactionBase):
-    pass
-
-class Transaction(TransactionBase):
-    id: int
-    user: User
-    merchant: Merchant
-
-    class Config:
-        orm_mode = True
+class UserDetail(CamelModel):
+    firebase_uid: str
+    email: str
+    name: str
