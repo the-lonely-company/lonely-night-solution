@@ -20,7 +20,8 @@ class Users(Base):
     date_of_birth = Column(Date)
     is_merchant = Column(Boolean, default=False)
 
-    customer_orders = relationship("Customer_Orders", back_populates="Users")
+    customer_orders = relationship("Customer_Orders", back_populates="user")
+    merchant = relationship("Merchants", back_populates="user", uselist=False)
 
 
 class Merchants(Base):
@@ -36,8 +37,8 @@ class Merchants(Base):
 
     user_id = Column(Integer, ForeignKey('Users.user_id'), unique=True)
 
-    user = relationship("Users", back_populates="Merchants")
-    customer_orders = relationship("Customer_Orders", back_populates="Merchants")
+    user = relationship("Users", back_populates="merchant")
+    customer_orders = relationship("Customer_Orders", back_populates="merchant")
 
 
 class Customer_Orders(Base):
@@ -54,8 +55,8 @@ class Customer_Orders(Base):
     merchant_id = Column(Integer, ForeignKey('Merchants.merchant_id'))
     total_order_amount = Column(Float)
 
-    user = relationship("Users", back_populates="Customer_Orders")
-    merchant = relationship("Merchants", back_populates="Customer_Orders")
+    user = relationship("Users", back_populates="customer_orders")
+    merchant = relationship("Merchants", back_populates="customer_orders")
 
 class Customer_Orders_Items(Base):
     """

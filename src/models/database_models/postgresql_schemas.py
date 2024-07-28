@@ -3,20 +3,21 @@ from typing import List, Optional
 from datetime import date
 
 class UserBase(BaseModel):
-    user_id: str
+    user_id: int
+    firebase_uid: str
     email: str
     name: Optional[str] = None
     address: Optional[str] = None
     phone_number_prefix: Optional[str] = None
     phone_number: Optional[str] = None
-    birthday: Optional[date] = None
+    date_of_birth: Optional[date] = None
+    is_merchant: Optional[bool] = False
     is_active: Optional[bool] = True
 
 class UserCreate(UserBase):
     pass
 
 class User(UserBase):
-    id: int
     transactions: List['Transaction'] = []
 
     class Config:
