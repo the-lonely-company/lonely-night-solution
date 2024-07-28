@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
 from models.database_models import postgresql_schemas
 from models import postgresql_model
-from connections.postgreSQL.postgresql_connection import engine 
-from fastapi import Depends, FastAPI
 from connections.postgreSQL.postgresql_connection import global_sql_session
 
 class PostgresqlClient:

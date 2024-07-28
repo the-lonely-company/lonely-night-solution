@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
 from models.database_models.postgresql_schemas import User, UserCreate
 from connections.postgreSQL.postgresql_client import postgresql_client
 
