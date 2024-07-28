@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.database_models import postgreSQL_schemas
+from models.database_models import postgresql_schemas
 from models import postgresql_model
 from connections.postgreSQL.postgresql_connection import SessionLocal, engine
 from fastapi import Depends, FastAPI

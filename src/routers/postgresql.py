@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 # from models.postgresql_model import User
-from models.database_models.postgreSQL_schemas import User
+from models.database_models.postgresql_schemas import User
 from connections.postgreSQL.postgresql_client import postgresqlClient
 from connections.postgreSQL.postgresql_connection import SessionLocal
 
