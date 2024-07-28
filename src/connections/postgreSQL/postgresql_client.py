@@ -13,4 +13,16 @@ class PostgresqlClient:
     def get_user(self, user_id: int):
         return self.session.query(postgresql_model.Users).filter(postgresql_model.Users.user_id == user_id).first()
 
-postgresqlClient = PostgresqlClient(global_sql_session)
+    #  create a user
+    def create_user(self, user: postgresql_schemas.UserCreate):
+        user = postgresql_model.Users(
+            firebase_uid=user.firebase_uid,
+            email=user.email,
+            name=user.name
+        )
+        self.session.add(user)
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+
+postgresql_client = PostgresqlClient(global_sql_session)

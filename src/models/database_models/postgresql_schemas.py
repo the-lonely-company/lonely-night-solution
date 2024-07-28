@@ -14,8 +14,10 @@ class UserBase(BaseModel):
     is_merchant: Optional[bool] = False
     is_active: Optional[bool] = True
 
-class UserCreate(UserBase):
-    pass
+class UserCreate(BaseModel):
+    firebase_uid: str
+    email: str
+    name: str
 
 class User(UserBase):
     transactions: List['Transaction'] = []
