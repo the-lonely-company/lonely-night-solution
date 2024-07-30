@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+from sqlalchemy.exc import IntegrityError
+
 from models.account_model import User, UserDetail
 from connections.postgresqldb.postgresql_client import postgresql_client
 
@@ -17,5 +19,7 @@ async def get_user(user_id: int) -> User:
 
 @account_router.post('/create_user', response_model=User)
 async def create_user(detail: UserDetail) -> User:
-    user = postgresql_client.create_user(detail)
-    return user
+    try: 
+        return postgresql_client.create_user(detail)
+    except IntegrityError as e:
+        raise HTTPException(status_code=409, detail="A user with this email already exists.")
