@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from models.account_model import User, UserDetail
-from connections.postgresqldb.postgresql_client import postgresql_client
+from model.account_model import User, UserDetail
+from connection.postgresqldb.postgresql_client import postgresql_client
 
 
 account_router = APIRouter(

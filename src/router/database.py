@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from models.api_models import Stock
-from connections.mongodb.mongodb_client import beverages_inventory
+from model.api_models import Stock
+from connection.mongodb.mongodb_client import beverages_inventory
 
 
 db_router = APIRouter(

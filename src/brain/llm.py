@@ -18,12 +18,12 @@ class LLM:
         self.llm_client = groq_client
         self.llm = 'llama3-70b-8192'        
 
-    def get_completion(self, messages):
+    def invoke(self, messages):
         response = self.llm_client.chat.completions.create(
             model=self.llm,
             messages=messages,
             temperature=1,
-            max_tokens=1024,
+            max_tokens=8192,
             top_p=1,
             stream=False,
             response_format={"type": "json_object"},
