@@ -18,7 +18,7 @@ the object {"foo": ["bar", "baz"]} is a well-formatted instance of the schema. T
 
 Here is the output schema:
 ```
-{"$defs": {"Detail": {"properties": {"types": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "description": "Types of wines, red, white, sparkling, rose, dessert, null if not specificed.", "title": "Types"}, "grapes": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "description": "Grapes, null if not specified.", "title": "Grapes"}, "alcohol": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "description": "Alcohol content, null if user did not specify."}, "vintages": {"anyOf": [{"items": {"type": "integer"}, "type": "array"}, {"type": "null"}], "description": "Vintages, null if user did not specify.", "title": "Vintages"}, "price": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "description": "Price in HKD currency, null if user did not specify in the query."}, "region": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "description": "Regions, null if not specified.", "title": "Region"}, "winery": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "description": "Wineries, null if not specified.", "title": "Winery"}, "quantity": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "description": "Quantity, null if user did not specify."}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "description": "characteristics of the suggested wines, sweetness, acidity, tannin, alcohol and body.", "title": "Description"}}, "required": ["types", "grapes", "alcohol", "vintages", "price", "region", "winery", "quantity", "description"], "title": "Detail", "type": "object"}, "QuantitativeRange": {"properties": {"minimum": {"anyOf": [{"type": "number"}, {"type": "null"}], "description": "Minimum of the item, null if not specified.", "title": "Minimum"}, "around": {"anyOf": [{"type": "number"}, {"type": "null"}], "description": "Around the item range, null if not specified.", "title": "Around"}, "maximum": {"anyOf": [{"type": "number"}, {"type": "null"}], "description": "Maximum of the item, null if not specified.", "title": "Maximum"}}, "required": ["minimum", "around", "maximum"], "title": "QuantitativeRange", "type": "object"}}, "properties": {"condition": {"description": "Conditions that the wine suggestion profile is under.", "title": "Condition", "type": "string"}, "requirements": {"description": "User's specific requirements on wines", "title": "Requirements", "type": "string"}, "analysis": {"description": "Analyze the findings from condition and requirements.", "title": "Analysis", "type": "string"}, "proposal": {"description": "Propose a suggestion as a solution to conditions and requirements.", "title": "Proposal", "type": "string"}, "detail": {"description": "Details of the suggested wines.", "items": {"$ref": "#/$defs/Detail"}, "title": "Detail", "type": "array"}}, "required": ["condition", "requirements", "analysis", "proposal", "detail"]}
+{"$defs": {"Detail": {"properties": {"types": {"anyOf": [{"items": {"$ref": "#/$defs/WineType"}, "type": "array"}, {"type": "null"}], "default": null, "description": "Types of wines: Red, Ros\u00e9, White, Sparkling, Dessert, or Fortified. Null if not specified.", "title": "Types"}, "grapes": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "default": null, "description": "Grapes, null if not specified.", "title": "Grapes"}, "alcohol": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "default": null, "description": "Alcohol content, null if user did not specify."}, "vintages": {"anyOf": [{"items": {"type": "integer"}, "type": "array"}, {"type": "null"}], "default": null, "description": "Vintages, null if user did not specify.", "title": "Vintages"}, "price": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "default": null, "description": "Price in HKD currency, null if user did not specify in the query."}, "regions": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "default": null, "description": "Regions, null if not specified.", "title": "Regions"}, "wineries": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "default": null, "description": "Wineries, null if not specified.", "title": "Wineries"}, "quantity": {"anyOf": [{"$ref": "#/$defs/QuantitativeRange"}, {"type": "null"}], "default": null, "description": "Quantity, null if user did not specify."}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "default": null, "description": "Characteristics of the suggested wines, sweetness, acidity, tannin, alcohol and body.", "title": "Description"}}, "title": "Detail", "type": "object"}, "QuantitativeRange": {"properties": {"minimum": {"anyOf": [{"type": "number"}, {"type": "null"}], "default": null, "description": "Minimum of the item, null if not specified.", "title": "Minimum"}, "around": {"anyOf": [{"type": "number"}, {"type": "null"}], "default": null, "description": "Around the item range, null if not specified.", "title": "Around"}, "maximum": {"anyOf": [{"type": "number"}, {"type": "null"}], "default": null, "description": "Maximum of the item, null if not specified.", "title": "Maximum"}}, "title": "QuantitativeRange", "type": "object"}, "WineType": {"enum": ["Red wine", "Ros\u00e9 wine", "White wine", "Sparkling wine", "Dessert wine", "Fortified wine"], "title": "WineType", "type": "string"}}, "properties": {"condition": {"description": "Conditions that the wine suggestion profile is under.", "title": "Condition", "type": "string"}, "requirements": {"description": "User's specific requirements on wines", "title": "Requirements", "type": "string"}, "analysis": {"description": "Analyze the findings from condition and requirements.", "title": "Analysis", "type": "string"}, "proposal": {"description": "Propose a suggestion as a solution to conditions and requirements.", "title": "Proposal", "type": "string"}, "detail": {"allOf": [{"$ref": "#/$defs/Detail"}], "description": "Details of the suggested wines."}}, "required": ["condition", "requirements", "analysis", "proposal", "detail"]}
 ```
 '''
 
@@ -40,31 +40,5 @@ Give an input question, create a syntactically correct query.
 5. Only query the fields that are needed.
 6. PRINT in JSON format.
 
-Examples to follow:
-
-question: Any mouton is after 1993 and from Champagne?
-answer: {"region": "Champagne", "winery": "Chateau Mouton Rothschild", "vintage": {"$gt": 1993}}
-
-question: Any champagne within 2000 dollars?
-answer: {"region": "Champagne", "price": {"$lte": 2000}}
-
-question: Any wine around 2000 dollars and from around 1990?
-answer: { "category": "wine", "price": {"$gte": 1900, "$lte": 2100}, "vintage": {"$gte": 1985, "$lte": 1995}}
-
-Only use tables listed below. Collection 'Inventory' stores the data of different alcoholic beverages in inventory. Collection 'Inventory' schema: 
-
-code (int32) - unique code of the bottle.
-category (string) - category of the bottle, e.g. whisky, wine, rum.
-sub_category (string) - subcategory of the bottle, e.g. red, sparkling wine.
-region (string) - where is the bottle from.
-winery (string) - where is the bottle made.
-vintage (int32) - where year is the bottle made.
-label (string) - label of the bottle.
-volume (int32) - volume of the bottle.
-quantity (int32) - number of bottles left in inventory.
-price (double) - price of the bottle.
-
-Here are some relevant example documents (value is the same order as the attributes order above)
-(171, 'wine', 'sparkling wine', 'Champagne', 'Champagne Taittinger', 2000, 'Taittinger', 750.0, 1, 2398.0)
-(5, 'wine', 'red', 'Bordeaux', 'Chateau Mouton Rothschild', 1993, 'Chateau Mouton Rothschild', 750.0, 2, 5700)
+Here are some relevant example documents.
 '''

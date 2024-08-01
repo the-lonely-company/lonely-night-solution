@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from model.api_models import Stock
-from connection.mongodb.mongodb_client import beverages_inventory
+from connection.mongodb.mongodb_client import beverage_resource
 
 
 db_router = APIRouter(
@@ -28,7 +28,7 @@ async def get_alcohols(category: str, code: int) -> Stock:
         'image': 1
     }
 
-    item = beverages_inventory.find_one(query, projection)
+    item = beverage_resource.get_beverages_by_query(query, projection)
 
     if item:
         return Stock(**item)
