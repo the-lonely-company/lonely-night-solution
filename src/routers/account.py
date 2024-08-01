@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import ValidationError, IntegrityError
+from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError
 from loguru import logger
 
 from models.account_model import User, UserDetail
