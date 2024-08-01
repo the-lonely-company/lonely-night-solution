@@ -25,7 +25,7 @@ class PostgresqlClient:
             self.session.commit()
             self.session.refresh(user)
             return user
-        except IntegrityError as e:
+        except Exception as e:
             self.session.rollback()
             raise e
 
