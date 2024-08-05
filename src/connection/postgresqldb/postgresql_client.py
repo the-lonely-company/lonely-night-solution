@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from model.database_model.postgresql_model import User
 from model.account_model import UserDetail
@@ -19,9 +20,13 @@ class PostgresqlClient:
             email=detail.email,
             name=detail.name
         )
-        self.session.add(user)
-        self.session.commit()
-        self.session.refresh(user)
-        return user
+        try:
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
+            return user
+        except Exception as e:
+            self.session.rollback()
+            raise e
 
 postgresql_client = PostgresqlClient(global_sql_session)
