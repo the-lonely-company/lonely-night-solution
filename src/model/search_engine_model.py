@@ -1,6 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Union
+from pydantic import BaseModel, Field, ConfigDict
+from pydantic.alias_generators import to_camel
+from typing import Optional, List, Union, Dict, Any
 from enum import Enum
+from humps import camelize
+
 
 from model.camel_model import CamelModel
 
@@ -46,3 +49,36 @@ class DetailQuery(BaseModel):
 
 class DetailQueris(BaseModel):
     detail_queries: List[DetailQuery] = Field(description="Detail queries to query the details.")
+
+class Grape(CamelModel):
+    name: str
+
+class Winery(CamelModel):
+    name: str
+
+class Country(CamelModel):
+    name: str
+
+class Region(CamelModel):
+    name: str
+    country: Country
+
+class Style(CamelModel):
+    wine_type: Optional[str] = None
+    varietal_name: Optional[str] = None
+    body_description: Optional[str] = None
+    acidity_description: Optional[str] = None
+
+class Beverage(CamelModel):
+    name: str
+    is_natural: Optional[bool] = None
+    alcohol: float
+    grapes: List[Grape]
+    winery: Optional[Winery] = None
+    region: Region
+    style: Optional[Style] = None
+    score: float
+
+class SearchEngineResponse(CamelModel):
+    explanation: str
+    beverages: List[Beverage]

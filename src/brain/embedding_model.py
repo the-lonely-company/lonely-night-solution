@@ -21,7 +21,7 @@ class EmbeddingModel:
             'encoding_type': 'float'
         }
 
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
 
         return response.json()['data']
 

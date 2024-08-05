@@ -42,3 +42,5 @@ Give an input question, create a syntactically correct query.
 
 Here are some relevant example documents.
 '''
+
+THIRED_LAYER_PROMPT = '''You are an wine expert. Your task is to explain why you pick these wines to meet user's need. Explain per wine why that wine fits for them. Be precise and as short as possible. In point form.'''

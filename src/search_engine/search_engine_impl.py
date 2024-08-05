@@ -7,8 +7,8 @@ from pydantic import parse_obj_as
 from brain.llm import llm
 from brain.embedding_model import embedding_model
 from connection.mongodb.mongodb_client import beverage_resource
-from model.search_engine_model import Message, WineProfile
-from search_engine.prompt import FIRST_LAYER_PROMPT, SECOND_LAYER_PROMPT
+from model.search_engine_model import Message, WineProfile, SearchEngineResponse
+from search_engine.prompt import FIRST_LAYER_PROMPT, SECOND_LAYER_PROMPT, THIRED_LAYER_PROMPT
 
 
 def add_sys_prompt(prompt: str):
@@ -51,8 +51,15 @@ class SearchEngineImpl:
 
         return json.loads(response)
     
+    @add_sys_prompt(THIRED_LAYER_PROMPT)
+    def third_layer(self, messages: List[Message]):
+        response = self.llm.invoke(messages, get_json=False)
+
+        return response
+    
     def construct_beverage_references(self, wine_profile_detail):
         feature_mapping = {
+            'types': 'type',
             'grapes': 'grape',
             'regions': 'region',
             'wineries': 'winery'
@@ -96,7 +103,7 @@ class SearchEngineImpl:
 
         return updated_second_layer_prompt
     
-    def get_relavent_wine_detaiL(self, wine_profile_detail):
+    def get_relavent_wine_detail(self, wine_profile_detail):
         detail_as_dict = {k: v for k, v in wine_profile_detail.dict().items() if v is not None and k != 'price' and k != 'description' and k != 'quantity'}
         logger.info(detail_as_dict)
 
@@ -107,27 +114,46 @@ class SearchEngineImpl:
 
         wine_profile_detail = wine_profile.detail
 
-        beverage_references = self.construct_beverage_references(wine_profile_detail)
+        # Check if any fields except 'description' exist
+        detail_as_dict = self.get_relavent_wine_detail(wine_profile_detail)
+        if detail_as_dict:
+            beverage_references = self.construct_beverage_references(wine_profile_detail)
 
-        updated_second_layer_prompt = self.construct_second_layer_prompt(beverage_references)
+            updated_second_layer_prompt = self.construct_second_layer_prompt(beverage_references)
 
-        detail_as_dict = self.get_relavent_wine_detaiL(wine_profile_detail)
+            detail_sentence = "The wine profile details are: "
+            for key, value in detail_as_dict.items():
+                detail_sentence += f"The {key} is {value}, "
+            detail_sentence = detail_sentence.rstrip(', ') + "."
+            logger.info(detail_sentence)
 
-        detail_sentence = "The wine profile details are: "
-        for key, value in detail_as_dict.items():
-            detail_sentence += f"The {key} is {value}, "
-        detail_sentence = detail_sentence.rstrip(', ') + "."
-        logger.info(detail_sentence)
+            beverage_query = self.second_layer(updated_second_layer_prompt, detail_sentence)
 
-        beverage_query = self.second_layer(updated_second_layer_prompt, detail_sentence)
-
-        logger.info(beverage_query)
+            logger.info(beverage_query)
+        else:
+            beverage_query = []
 
         description_embedding = self.embedding_model.embed(wine_profile_detail.description)[0]['embedding']
 
         matched_beverages = self.beverage_resource.get_matched_beverages(beverage_query, description_embedding, 4)
 
-        return matched_beverages
+        # Prepare the third layer input
+        third_layer_input = {
+            "matched_beverages": matched_beverages,
+            "condition": wine_profile.condition,
+            "requirements": wine_profile.requirements,
+            "analysis": wine_profile.analysis,
+            "proposal": wine_profile.proposal
+        }
+
+        third_layer_response = self.third_layer([{"role": "user", "content": json.dumps(third_layer_input)}])
+
+        response = SearchEngineResponse(
+            explanation=third_layer_response,
+            beverages=matched_beverages
+        )
+
+        return response
 
 
 search_engine = SearchEngineImpl()

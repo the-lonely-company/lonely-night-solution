@@ -42,8 +42,11 @@ class BeverageResource:
         return stocks
     
     def get_matched_beverages(self, query, description_embedding, quantity):
-        matched_stocks = self.beverage_wine.find(query, {"_id": 1})
-        matched_ids = [stock['_id'] for stock in matched_stocks]
+        if query:
+            matched_stocks = self.beverage_wine.find(query, {"_id": 1})
+            matched_ids = [stock['_id'] for stock in matched_stocks]
+        else:
+            matched_ids = []
 
         logger.info(matched_ids)
 
@@ -52,7 +55,6 @@ class BeverageResource:
                 '$vectorSearch': {
                     'index': 'description_embedding_index', 
                     'path': 'description_embedding', 
-                    'filter': {'_id': { '$in': matched_ids }},
                     'queryVector': description_embedding,
                     'exact': True,
                     'limit': quantity
@@ -77,6 +79,9 @@ class BeverageResource:
                 }
             }
         ]
+
+        if matched_ids:
+            embedding_pipeline[0]['$vectorSearch']['filter'] = {'_id': {'$in': matched_ids[:10]}}
 
         result = self.beverage_wine.aggregate(embedding_pipeline)
         final_stocks = [dict(r) for r in result]
