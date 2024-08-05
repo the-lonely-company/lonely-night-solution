@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-from models.camel_model import CamelModel
+from model.camel_model import CamelModel
 
 
 class User(BaseModel):

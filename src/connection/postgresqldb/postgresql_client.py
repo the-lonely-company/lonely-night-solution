@@ -1,8 +1,8 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from models.database_models.postgresql_model import User
-from models.account_model import UserDetail
-from connections.postgresqldb.postgresql_connection import global_sql_session
+from model.database_model.postgresql_model import User
+from model.account_model import UserDetail
+from connection.postgresqldb.postgresql_connection import global_sql_session
 
 
 class PostgresqlClient:

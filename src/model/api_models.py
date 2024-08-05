@@ -3,7 +3,7 @@ import math
 
 from pydantic import BaseModel, Field, field_validator
 
-from models.camel_model import CamelModel
+from model.camel_model import CamelModel
 
 
 class Alcohol(CamelModel):

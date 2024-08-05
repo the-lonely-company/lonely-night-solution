@@ -1,3 +1,4 @@
+from typing import List
 import requests
 
 
@@ -6,7 +7,7 @@ class EmbeddingModel:
         self.model = 'jina-embeddings-v2-base-en'
         self.authorization = 'Bearer jina_68bf5c2948544e35a150c76ee3642c7bFPBrLd_G2FJySxMDdnuSmY8KmbdF'
 
-    def embed(self, text):
+    def embed(self, text: List[str]):
         url = 'https://api.jina.ai/v1/embeddings'
 
         headers = {
@@ -20,9 +21,9 @@ class EmbeddingModel:
             'encoding_type': 'float'
         }
 
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
 
-        return response.json()['data'][0]['embedding']
+        return response.json()['data']
 
 
 embedding_model = EmbeddingModel()

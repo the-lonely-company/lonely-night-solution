@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, Date
 from sqlalchemy.orm import relationship
 
-from connections.postgresqldb.postgresql_connection import Base
+from connection.postgresqldb.postgresql_connection import Base
 
 class User(Base):
     """
