@@ -2,6 +2,8 @@ import json
 from pymongo.mongo_client import MongoClient
 from loguru import logger
 
+from model.database_model.beverage import Beverage
+
 
 class BeverageResource:
     def __init__(self):
@@ -9,37 +11,12 @@ class BeverageResource:
         self.beverage_db = self.db_client.beverage
         self.beverage_wine = self.beverage_db['wine']
 
-    def get_beverages_by_query(self, query):
-        pipeline = [
-            {
-                '$match': query
-            }, {
-                '$project': {
-                    '_id': 0, 
-                    'code': 1,
-                    'category': 1,
-                    'sub_category': 1,
-                    'region': 1,
-                    'winery': 1,
-                    'vintage': 1,
-                    'label': 1, 
-                    'volume': 1,
-                    'quantity': 1,
-                    'price': 1,
-                    'description': 1,
-                    'image': 1
-                }
-            }, {
-                '$limit': 4
-            }
-        ]
-
-        result = self.beverages_inventory.aggregate(pipeline)
-        stocks = [dict(r) for r in result]
-
-        logger.debug([stock.keys() for stock in stocks])
-
-        return stocks
+    def get_beverage_by_id(self, id):
+        result = self.beverage_wine.find_one({"url_id": id})
+        if result:
+            return Beverage(**result)
+        else:
+            return None
     
     def get_matched_beverages(self, query, description_embedding, quantity):
         if query:
@@ -62,6 +39,7 @@ class BeverageResource:
             }, {
                 '$project': {
                     '_id': 0,
+                    'url_id': 1,
                     'name': 1,
                     'is_natural': 1,
                     'alcohol': 1, 
@@ -84,9 +62,9 @@ class BeverageResource:
             embedding_pipeline[0]['$vectorSearch']['filter'] = {'_id': {'$in': matched_ids[:10]}}
 
         result = self.beverage_wine.aggregate(embedding_pipeline)
-        final_stocks = [dict(r) for r in result]
+        beverages = [Beverage(**item) for item in result]
 
-        return final_stocks
+        return beverages
 
 
     def meta_vector_search(self, embedding):

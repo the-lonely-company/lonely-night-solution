@@ -139,18 +139,18 @@ class SearchEngineImpl:
 
         # Prepare the third layer input
         third_layer_input = {
-            "matched_beverages": matched_beverages,
+            "matched_beverages": [b.model_dump() for b in matched_beverages],
             "condition": wine_profile.condition,
             "requirements": wine_profile.requirements,
             "analysis": wine_profile.analysis,
             "proposal": wine_profile.proposal
         }
 
-        third_layer_response = self.third_layer([{"role": "user", "content": json.dumps(third_layer_input)}])
+        explanation = self.third_layer([{"role": "user", "content": json.dumps(third_layer_input)}])
 
         response = SearchEngineResponse(
-            explanation=third_layer_response,
-            beverages=matched_beverages
+            explanation=explanation,
+            beverages=[b.to_camel_dict() for b in matched_beverages]
         )
 
         return response

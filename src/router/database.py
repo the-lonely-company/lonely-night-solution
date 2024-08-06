@@ -1,36 +1,19 @@
-from fastapi import APIRouter
-from model.api_models import Stock
+from fastapi import APIRouter, HTTPException
 from connection.mongodb.mongodb_client import beverage_resource
+from model.api_model.beverage import Beverage
 
 
 db_router = APIRouter(
-    prefix='/database',
-    tags=['Database']
+    prefix='/beverage',
+    tags=['Beverage']
 )
 
 
-@db_router.get('/get_stock', response_model=Stock)
-async def get_alcohols(category: str, code: int) -> Stock:
-    query = {'category': category, 'code': code}
-
-    projection = {
-        'code': 1,
-        'category': 1,
-        'sub_category': 1,
-        'region': 1,
-        'winery': 1,
-        'vintage': 1,
-        'label': 1,
-        'volume': 1,
-        'quantity': 1,
-        'price': 1,
-        'description': 1,
-        'image': 1
-    }
-
-    item = beverage_resource.get_beverages_by_query(query, projection)
+@db_router.get('/get-beverage', response_model=Beverage)
+async def get_alcohols(id: int) -> Beverage:
+    item = beverage_resource.get_beverage_by_id(id)
 
     if item:
-        return Stock(**item)
+        return Beverage(**item.to_camel_dict())
     else:
-        return f'No stock with category {category} and code {code} found'
+        return HTTPException(status_code=404, detail="Item not found")
