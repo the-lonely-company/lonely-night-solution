@@ -3,6 +3,7 @@ from pydantic.alias_generators import to_camel
 from typing import Optional, List, Union, Dict, Any
 from enum import Enum
 from humps import camelize
+from bson import ObjectId
 
 
 from model.camel_model import CamelModel
@@ -70,6 +71,7 @@ class Style(CamelModel):
     acidity_description: Optional[str] = None
 
 class Beverage(CamelModel):
+    url_id: int
     name: str
     is_natural: Optional[bool] = None
     alcohol: float
