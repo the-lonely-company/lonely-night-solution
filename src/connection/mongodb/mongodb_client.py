@@ -25,7 +25,7 @@ class BeverageResource:
         else:
             matched_ids = []
 
-        logger.info(matched_ids)
+        logger.info(f"Number fo beverages by query - {len(matched_ids)}")
 
         embedding_pipeline = [
             {
