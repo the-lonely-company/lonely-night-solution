@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Callable
 import json
 from loguru import logger
 from pydantic import parse_obj_as
+import markdown
 
 from brain.llm import llm
 from brain.embedding_model import embedding_model
@@ -61,6 +62,7 @@ class SearchEngineImpl:
         feature_mapping = {
             'types': 'type',
             'grapes': 'grape',
+            'countries': 'country',
             'regions': 'region',
             'wineries': 'winery'
         }
@@ -85,8 +87,6 @@ class SearchEngineImpl:
 
             beverage_references += matches
 
-        [logger.info(b_r) for b_r in beverage_references]
-
         return beverage_references
 
     def construct_second_layer_prompt(self, beverage_references: List[Dict[str, Any]]):
@@ -94,8 +94,6 @@ class SearchEngineImpl:
 
         for reference in beverage_references:
             reference_json = json.dumps(reference)
-
-            logger.info(reference_json)
 
             updated_second_layer_prompt += f"\n{reference_json}\n"
 
@@ -105,7 +103,6 @@ class SearchEngineImpl:
     
     def get_relavent_wine_detail(self, wine_profile_detail):
         detail_as_dict = {k: v for k, v in wine_profile_detail.dict().items() if v is not None and k != 'price' and k != 'description' and k != 'quantity'}
-        logger.info(detail_as_dict)
 
         return detail_as_dict
     
@@ -123,7 +120,7 @@ class SearchEngineImpl:
 
             detail_sentence = "The wine profile details are: "
             for key, value in detail_as_dict.items():
-                detail_sentence += f"The {key} is {value}, "
+                detail_sentence += f"The {key} are {','.join(value)}, "
             detail_sentence = detail_sentence.rstrip(', ') + "."
             logger.info(detail_sentence)
 
@@ -143,13 +140,17 @@ class SearchEngineImpl:
             "condition": wine_profile.condition,
             "requirements": wine_profile.requirements,
             "analysis": wine_profile.analysis,
-            "proposal": wine_profile.proposal
+            "profile": wine_profile.profile
         }
 
         explanation = self.third_layer([{"role": "user", "content": json.dumps(third_layer_input)}])
 
+        logger.info(explanation)
+
+        formatted_explanation = markdown.markdown(explanation).replace('\n', '<br/>')
+
         response = SearchEngineResponse(
-            explanation=explanation,
+            explanation=formatted_explanation,
             beverages=[b.to_camel_dict() for b in matched_beverages]
         )
 

@@ -12,5 +12,5 @@ search_engine_router = APIRouter(
 
 
 @search_engine_router.post("/query", response_model=SearchEngineResponse)
-async def query(messages: List[Message]) -> SearchEngineResponse:
+async def query(messages: List[Message]):
     return search_engine.respond(messages)
