@@ -19,50 +19,56 @@ class BeverageResource:
             return None
     
     def get_matched_beverages(self, query, description_embedding, quantity):
+        matched_ids = []
         if query:
             matched_stocks = self.beverage_wine.find(query, {"_id": 1})
             matched_ids = [stock['_id'] for stock in matched_stocks]
-        else:
-            matched_ids = []
+
+        projection = {
+            '_id': 0,
+            'url_id': 1,
+            'name': 1,
+            'is_natural': 1,
+            'alcohol': 1, 
+            'grapes.name': 1,
+            'winery.name': 1, 
+            'region.name': 1,
+            'region.country.name': 1,
+            'style.wine_type': 1,
+            'style.varietal_name': 1,
+            'style.body_description': 1,
+            'style.acidity_description': 1
+        }
 
         logger.info(f"Number fo beverages by query - {len(matched_ids)}")
 
-        embedding_pipeline = [
-            {
-                '$vectorSearch': {
-                    'index': 'description_embedding_index', 
-                    'path': 'description_embedding', 
-                    'queryVector': description_embedding,
-                    'exact': True,
-                    'limit': quantity
-                }
-            }, {
-                '$project': {
-                    '_id': 0,
-                    'url_id': 1,
-                    'name': 1,
-                    'is_natural': 1,
-                    'alcohol': 1, 
-                    'grapes.name': 1,
-                    'winery.name': 1, 
-                    'region.name': 1,
-                    'region.country.name': 1,
-                    'style.wine_type': 1,
-                    'style.varietal_name': 1,
-                    'style.body_description': 1,
-                    'style.acidity_description': 1,
-                    'score': {
-                        '$meta': 'vectorSearchScore'
+        if description_embedding:
+            embedding_pipeline = [
+                {
+                    '$vectorSearch': {
+                        'index': 'description_embedding_index', 
+                        'path': 'description_embedding', 
+                        'queryVector': description_embedding,
+                        'exact': True,
+                        'limit': quantity
+                    }
+                }, {
+                    '$project': {
+                        **projection,
+                        'score': {
+                            '$meta': 'vectorSearchScore'
+                        }
                     }
                 }
-            }
-        ]
+            ]
 
-        if matched_ids:
-            embedding_pipeline[0]['$vectorSearch']['filter'] = {'_id': {'$in': matched_ids[:10]}}
+            if matched_ids:
+                embedding_pipeline[0]['$vectorSearch']['filter'] = {'_id': {'$in': matched_ids[:10]}}
 
-        result = self.beverage_wine.aggregate(embedding_pipeline)
-        beverages = [Beverage(**item) for item in result]
+            result = self.beverage_wine.aggregate(embedding_pipeline)
+            beverages = [Beverage(**item) for item in result]
+        else:
+            beverages = [Beverage(**item) for item in self.beverage_wine.find(query, projection).limit(quantity)]
 
         return beverages
 

@@ -1,5 +1,6 @@
 from typing import List
 import requests
+from loguru import logger
 
 
 class EmbeddingModel:
@@ -21,7 +22,11 @@ class EmbeddingModel:
             'encoding_type': 'float'
         }
 
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        logger.info(f"Started a request to Jina API {payload}")
+
+        response = requests.post(url, headers=headers, json=payload, timeout=5)
+
+        logger.info(f"Received response from Jina API {response.status_code}")
 
         return response.json()['data']
 

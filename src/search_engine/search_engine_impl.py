@@ -130,8 +130,11 @@ class SearchEngineImpl:
         else:
             beverage_query = []
 
-        description_embedding = self.embedding_model.embed(wine_profile_detail.description)[0]['embedding']
-
+        if wine_profile_detail.description:
+            description_embedding = self.embedding_model.embed(wine_profile_detail.description)[0]['embedding']
+        else:
+            description_embedding = None
+        
         matched_beverages = self.beverage_resource.get_matched_beverages(beverage_query, description_embedding, 4)
 
         # Prepare the third layer input

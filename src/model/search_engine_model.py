@@ -39,7 +39,7 @@ class Detail(BaseModel):
     description: Optional[str] = Field(default=None, description="Characteristics of the suggested wines, sweetness, acidity, tannin, alcohol and body.")
 
 class WineProfile(BaseModel):
-    condition: str = Field(description='Conditions that the wine suggestion profile is under.')
+    condition: Optional[str] = Field(description='Conditions that the wine suggestion profile is under.')
     requirements: str = Field(description="User's specific requirements on wines")
     analysis: str = Field(description="Analyze the findings from condition and requirements.")
     profile: str = Field(description="Profile of the wines.")
@@ -80,7 +80,7 @@ class Beverage(CamelModel):
     winery: Optional[Winery] = None
     region: Region
     style: Optional[Style] = None
-    score: float
+    score: Optional[float] = None
 
 class SearchEngineResponse(CamelModel):
     explanation: str
