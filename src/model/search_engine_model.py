@@ -35,7 +35,7 @@ class Detail(BaseModel):
     countries: Optional[List[str]] = Field(default=None, description="Countries.")
     regions: Optional[List[str]] = Field(default=None, description="Regions.")
     wineries: Optional[List[str]] = Field(default=None, description="Wineries.")
-    quantity: Optional[QuantitativeRange] = Field(default=None, description="Number of bottles.")
+    quantity: Optional[int] = Field(default=None, description="Number of bottles.")
     description: Optional[str] = Field(default=None, description="Characteristics of the suggested wines, sweetness, acidity, tannin, alcohol and body.")
 
 class WineProfile(BaseModel):
