@@ -118,9 +118,11 @@ class SearchEngineImpl:
 
             updated_second_layer_prompt = self.construct_second_layer_prompt(beverage_references)
 
+            logger.info(detail_as_dict)
+
             detail_sentence = "The wine profile details are: "
             for key, value in detail_as_dict.items():
-                detail_sentence += f"The {key} are {','.join(value)}, "
+                detail_sentence += f"The {key} are {','.join(map(str, value))}, "
             detail_sentence = detail_sentence.rstrip(', ') + "."
             logger.info(detail_sentence)
 
