@@ -40,9 +40,9 @@ class Detail(BaseModel):
 
 class WineProfile(BaseModel):
     condition: Optional[str] = Field(description='Conditions that the wine suggestion profile is under.')
-    requirements: str = Field(description="User's specific requirements on wines")
-    analysis: str = Field(description="Analyze the findings from condition and requirements.")
-    profile: str = Field(description="Profile of the wines.")
+    requirements: Optional[str] = Field(description="User's specific requirements on wines")
+    analysis: Optional[str] = Field(description="Analyze the findings from condition and requirements.")
+    profile: Optional[str] = Field(description="Profile of the wines.")
     detail: Detail = Field(description="Details of the suggested wines.")
 
 class DetailQuery(BaseModel):
