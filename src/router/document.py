@@ -12,7 +12,7 @@ document_router = APIRouter(
 
 @document_router.get("/terms-and-conditions", response_class=HTMLResponse)
 async def get_terms_and_conditions():
-    file_path = "documents/night_solution_terms_and_conditions.md"
+    file_path = "document/night_solution_terms_and_conditions.md"
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Terms and Conditions file not found")
